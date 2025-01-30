@@ -1,0 +1,16 @@
+  JOURNAL MODEL
+TITLE
+ABSTARCT
+start year
+issn -1)print 
+	2)online
+EDITORIAL BOARD - (will store array of names with role(editor-in-chief and Editorial Board Members) , affiliation, email, profile link, which will be seperate for each journals
+AIM & SCOPE - (will store descritopn and lists of aims of journals)diff for every journal
+
+papermodel
+title -
+authors-{name, email, affiliation}
+index terms-
+abstract-
+refrences -
+pages-
