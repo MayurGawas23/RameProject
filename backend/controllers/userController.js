@@ -3,7 +3,7 @@ const JournalModel = require('../models/JournalModel')
 const userService = require('../utils/user.service')
 const { validationResult } = require('express-validator')
 // const blackListTokenModel = require('../models/blacklistToken');
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 const nodemailer = require('nodemailer');
 
 
