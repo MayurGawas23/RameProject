@@ -4,8 +4,8 @@ import { parse } from "cookie";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 
-const AssignReviewers = ({ articles, reviewers, initialError }) => {
-  const [selectedArticle, setSelectedArticle] = useState("");
+const AssignReviewers = ({ papers, reviewers, initialError }) => {
+  const [selectedPaper, setSelectedPaper] = useState("");
   const [selectedReviewers, setSelectedReviewers] = useState([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState(initialError || "");
@@ -15,16 +15,16 @@ const AssignReviewers = ({ articles, reviewers, initialError }) => {
     setMessage("");
     setError("");
 
-    if (!selectedArticle || selectedReviewers.length === 0) {
-      setError("Please select an article and at least one reviewer.");
+    if (!selectedPaper || selectedReviewers.length === 0) {
+      setError("Please select an paper and at least one reviewer.");
       return;
     }
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/articles/assign-reviewers`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/papers/assign-reviewers`,
         {
-          articletitle: selectedArticle,
+          paperTitle: selectedPaper,
           reviewers: selectedReviewers,
         },
         {
@@ -52,16 +52,16 @@ const AssignReviewers = ({ articles, reviewers, initialError }) => {
 
       <form onSubmit={handleAssign} className="max-w-lg mx-auto bg-white p-6 rounded shadow">
         <div className="mb-4">
-          <label className="block mb-2 font-medium">Select Article:</label>
+          <label className="block mb-2 font-medium">Select Paper:</label>
           <select
-            value={selectedArticle}
-            onChange={(e) => setSelectedArticle(e.target.value)}
+            value={selectedPaper}
+            onChange={(e) => setSelectedPaper(e.target.value)}
             className="block w-full mb-3 p-2 border rounded"
           >
-            <option value="">-- Select Article --</option>
-            {articles.map((article) => (
-              <option key={article.title} value={article.title}>
-                {article.title}
+            <option value="">-- Select Paper --</option>
+            {papers.map((paper) => (
+              <option key={paper.title} value={paper.title}>
+                {paper.title}
               </option>
             ))}
           </select>
@@ -78,7 +78,7 @@ const AssignReviewers = ({ articles, reviewers, initialError }) => {
             className="block w-full mb-3 p-2 border rounded"
           >
             {reviewers.map((reviewer) => (
-              <option key={reviewer.username} value={reviewer.username}>
+              <option key={reviewer._id} value={reviewer.username}>
                 {reviewer.username}
               </option>
             ))}
@@ -106,7 +106,7 @@ export const getServerSideProps = async (context) => {
   if (!token) {
     return {
       props: {
-        articles: [],
+        papers: [],
         reviewers: [],
         initialError: "Authentication token not found. Please log in.",
       },
@@ -114,8 +114,8 @@ export const getServerSideProps = async (context) => {
   }
 
   try {
-    const [articlesRes, reviewersRes] = await Promise.all([
-      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/articles/articles`, {
+    const [papersRes, reviewersRes] = await Promise.all([
+      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/papers/papers`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
       axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/reviewers`, {
@@ -125,7 +125,7 @@ export const getServerSideProps = async (context) => {
 
     return {
       props: {
-        articles: articlesRes.data,
+        papers: papersRes.data,
         reviewers: reviewersRes.data,
         initialError: "",
       },
@@ -133,7 +133,7 @@ export const getServerSideProps = async (context) => {
   } catch (err) {
     return {
       props: {
-        articles: [],
+        papers: [],
         reviewers: [],
         initialError: err.response?.data?.error || "Failed to fetch data. Please try again.",
       },

@@ -27,7 +27,9 @@ module.exports.registerUser = async (req, res, next) => {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { username, email, password } = req.body;
+    const { fullname, username, email, password , affiliation, mobno } = req.body;
+
+    console.log("req body", req.body)
 
     const userExists = await UserModel.findOne({ email: email });
     if (userExists) {
@@ -37,9 +39,12 @@ module.exports.registerUser = async (req, res, next) => {
     const hashedPassword = await UserModel.hashPassword(password);
 
     const user = await userService.createUser({
+        fullname: fullname || "null",
         username,
         email,
         password: hashedPassword,
+        affiliation: affiliation || "null",
+        mobno : mobno || "null"
     });
 
     const token = await user.generateAuthToken();

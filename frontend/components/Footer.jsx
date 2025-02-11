@@ -2,11 +2,11 @@ import Link from 'next/link';
 
 const Footer = () => {
   return (
-    <footer className="z-40 w-full pt-3 bg-gray-200 border-t border-gray-200 text-black lg:h-[190px]">
-      <div className="flex flex-col lg:flex-row justify-between px-6 lg:px-20 space-y-10 lg:space-y-0">
+    <footer className="z-40 w-full pt-3 bg-[#1F2937] flex flex-col justify-between  text-[#8CA3A4] font-[poppins-regular]    ">
+      <div className="flex flex-col lg:flex-row justify-between px-6 lg:px-20 space-y-10 lg:space-y-10 mb-10">
         {/* Support Section */}
-        <div className="flex flex-col space-y-2">
-          <h1 className="font-semibold text-lg">Supports</h1>
+        <div className="flex flex-col space-y-2 mt-10">
+          <h1 className="font-semibold text-lg text-white">Supports</h1>
           <Link href="#" className="text-sm hover:underline">
             Help Overview
           </Link>
@@ -23,7 +23,7 @@ const Footer = () => {
 
         {/* Policies Section */}
         <div className="flex flex-col space-y-2">
-          <h1 className="font-semibold text-lg">Policies</h1>
+          <h1 className="font-semibold text-lg text-white">Policies</h1>
           <Link href="#" className="text-sm hover:underline">
             Authorship
           </Link>
@@ -40,7 +40,7 @@ const Footer = () => {
 
         {/* Download Forms Section */}
         <div className="flex flex-col space-y-2">
-          <h1 className="font-semibold text-lg">Download Forms</h1>
+          <h1 className="font-semibold text-lg text-white">Download Forms</h1>
           <Link href="#" className="text-sm hover:underline">
             Paper Template
           </Link>
@@ -57,7 +57,7 @@ const Footer = () => {
 
         {/* Contact Section */}
         <div className="flex flex-col space-y-2">
-          <h1 className="font-semibold text-lg">Contact</h1>
+          <h1 className="font-semibold text-lg text-white">Contact</h1>
           <p className="text-sm">
             <span className="font-medium">RAME Publishers,</span>
           </p>
@@ -73,7 +73,7 @@ const Footer = () => {
 
         {/* Socials Section */}
         <div className="flex flex-col space-y-3">
-          <h1 className="font-semibold text-lg">Socials</h1>
+          <h1 className="font-semibold text-lg text-white">Socials</h1>
           <div className="flex space-x-4">
             <Link href="#">
               <img
@@ -84,7 +84,7 @@ const Footer = () => {
             </Link>
             <Link href="#">
               <img
-                src="/twitter.png"
+                src="/x.png"
                 alt="Twitter"
                 className="h-6 w-6 hover:scale-110 transition-transform"
               />
@@ -104,13 +104,16 @@ const Footer = () => {
               />
             </Link>
           </div>
+        
         </div>
+      
       </div>
 
       {/* Footer Bottom */}
-      <div className="w-full text-center py-2 text-sm bg-gray-200">
+      <div className="w-full text-center py-4 border-t border-[#8CA3A4] text-sm bg-[#1F2937]">
         © 2025 RAME Publishers. All Rights Reserved.
       </div>
+      
     </footer>
   );
 };

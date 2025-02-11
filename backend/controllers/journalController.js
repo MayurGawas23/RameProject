@@ -1,27 +1,63 @@
 const JournalModel = require('../models/JournalModel');
 const axios = require('axios')
 const { fetchJournalData } = require('../utils/crossref');
-const { imageUploadutil, imageUploadUtil} = require('../utils/fileUpload')
+const { fileUploadUtil, imageUploadUtil} = require('../utils/fileUpload')
 
 // Controller to submit a journal
 module.exports.submitJournal = async (req, res) => {
   try {
-    const { title, content } = req.body;
+    const {
+      journalTitle,
+      short_title,
+      issn,
+      online_issn,
+      subject,
+      format,
+      publisher,
+      country,
+      abstract,
+      language,
+      doi,
+      frequency,
+      description, // ✅ Match with aimAndScope.description
+      topic, // ✅ Rename to aimAndScope.topics
+      coverImg,
+      website,
+      editorialBoard,
+    } = req.body;
 
-    if (!title || !content) {
-      return res.status(400).json({ message: 'Title and content are required' });
+    // Validate required fields
+    if (!journalTitle || !issn || !publisher || !abstract || !description) {
+      return res.status(400).json({ message: "Required fields are missing" });
     }
 
     const newJournal = new JournalModel({
-      title,
-      content,
-      author: req.user._id, // Attach the logged-in user's ID
+      journalTitle,
+      short_title,
+      issn,
+      online_issn,
+      subject,
+      format,
+      publisher,
+      country,
+      abstract,
+      language,
+      doi,
+      frequency,
+      website, // ✅ Ensure website is stored correctly
+      aimAndScope: { // ✅ Store description & topics properly
+        description,
+        topics: topic ? topic.split(",").map((t) => t.trim()) : [],
+      },
+      coverImg,
+      editorialBoard: editorialBoard || []
+      // author: req.user._id, // Attach the logged-in user's ID
     });
 
     const savedJournal = await newJournal.save();
-    res.status(201).json({ message: 'Journal submitted successfully', journal: savedJournal });
+    res.status(201).json({ message: "Journal submitted successfully", journal: savedJournal });
   } catch (error) {
-    res.status(500).json({ message: 'Error submitting journal', error: error.message });
+    res.status(500).json({ message: "Error submitting journal", error: error.message });
   }
 };
 
@@ -36,36 +72,43 @@ module.exports.getMyJournals = async (req, res) => {
 };
 
 // Controller to fetch all journals (Admin only)
-module.exports.getAllJournals = async (req, res) => {
-  try {
-    const journals = await JournalModel.find().populate('author', 'email'); // Populate user email
-    res.status(200).json({ journals });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching all journals', error: error.message });
-  }
-};
+// module.exports.getAllJournals = async (req, res) => {
+//   try {
+//     const journals = await JournalModel.find().populate('author', 'email'); // Populate user email
+//     res.status(200).json({ journals });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Error fetching all journals', error: error.message });
+//   }
+// };
 
 // Controller to update a journal by ID
 module.exports.updateJournal = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { title, content } = req.body;
 
-    const journal = await JournalModel.findOneAndUpdate(
-      { _id: id, author: req.user._id }, // Ensure only the journal owner can update
-      { title, content },
-      { new: true }
-    );
-
-    if (!journal) {
-      return res.status(404).json({ message: 'Journal not found or unauthorized' });
+    try {
+      const { issn } = req.params;
+      const updateData = req.body;
+  
+      console.log("Updating Journal - ISSN:", issn);
+      console.log("Update Data:", updateData);
+  
+      const updatedJournal = await JournalModel.findOneAndUpdate(
+        { issn: issn },
+        { $set: updateData },
+        { new: true, runValidators: true }
+      );
+  
+      if (!updatedJournal) {
+        return res.status(404).json({ message: "Journal not found" });
+      }
+  
+      res.status(200).json(updatedJournal);
+    } catch (error) {
+      console.error("Error updating journal:", error);
+      res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
+  };
+  
 
-    res.status(200).json({ message: 'Journal updated successfully', journal });
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating journal', error: error.message });
-  }
-};
 
 // Controller to delete a journal by ID (Admin only)
 module.exports.deleteJournal = async (req, res) => {
@@ -171,12 +214,12 @@ function delay(ms) {
 }
 
 // Fetch DOI Metadata with Retry
-async function fetchArticleDataByDOI(doi, retries = 5, delayMs = 1000) {
+async function fetchPaperDataByDOI(doi, retries = 5, delayMs = 1000) {
   const apiUrl = `https://api.crossref.org/works/${doi}`;
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const response = await axios.get(apiUrl);
-      return response.data.message; // Return article metadata
+      return response.data.message; // Return paper metadata
     } catch (error) {
       if (error.response && error.response.status === 429) {
         const waitTime = delayMs * 2 ** attempt; // Exponential backoff
@@ -205,15 +248,24 @@ async function saveToDatabase(metadata) {
 
   const journalTitleString = Array.isArray(journalTitle) ? journalTitle[0] : journalTitle || "Unknown Journal";
 
-  let journal = await JournalModel.findOne({ title: journalTitleString });
+  let journal = await JournalModel.findOne({ journalTitle: journalTitleString });
 
   if (!journal) {
     journal = new JournalModel({
-      title: journalTitleString,
+
+      journalTitle: journalTitleString,
       short_title: metadata.short_title || "shorttitle",
       issn: (ISSN && ISSN.length > 0) ? ISSN[0] : "N/A",
       online_issn: (ISSN && ISSN.length > 1) ? ISSN[1] : "N/A",
+      subject:  "null",
+      format: metadata.format || "null",
+      publisher: metadata.publisher || "null",
+      country:metadata.country || "null",
       abstract: metadata.abstract || "null",
+      language: metadata.language || "null",
+      doi:metadata.dio||"null",
+      frequency: metadata.frequency || "null",
+      website:metadata.URL || "null",
       volumes: [],
       coverImg: metadata.cover_img || "null"
     });
@@ -238,9 +290,13 @@ async function saveToDatabase(metadata) {
   })) : [];
 
   if (!issueEntry.papers.find(p => p.doi === DOI)) {
+    const paperNumber = issueEntry.papers.length > 0 
+    ? Math.max(...issueEntry.papers.map(p => p.paperNumber || 0)) + 1 
+    : 1;
     issueEntry.papers.push({
+      paperNumber,
       doi: DOI,
-      title: Array.isArray(title) ? title[0] : title || "Untitled Paper",
+      paperTitle: Array.isArray(title) ? title[0] : title || "Untitled Paper",
       authors: authors,
       abstract: metadata.abstract || "null",
       publicationDate: metadata.published?.['date-parts']?.[0]?.join('-') || null,
@@ -268,10 +324,10 @@ module.exports.fetchAndSaveDOIs = async (req, res) => {
 
   const results = [];
   for (const doi of dois) {
-    const metadata = await fetchArticleDataByDOI(doi);
+    const metadata = await fetchPaperDataByDOI(doi);
     if (metadata) {
       await saveToDatabase(metadata);
-      results.push({ doi, status: 'success' });
+      results.push({ doi, status: 'success', metadata });
     } else {
       results.push({ doi, status: 'failed' });
     }
@@ -284,7 +340,7 @@ module.exports.fetchAndSaveDOIs = async (req, res) => {
 // Get all journals
 exports.getAllJournals = async (req, res) => {
   try {
-    const journals = await JournalModel.find({}, 'title issn publisher short_title coverImg');
+    const journals = await JournalModel.find({}, 'journalTitle issn publisher short_title coverImg start_year abstract   ');
     console.log(journals)
     res.json(journals);
   } catch (error) {
@@ -296,21 +352,28 @@ exports.getAllJournals = async (req, res) => {
 exports.getJournalByISSN = async (req, res) => {
   try {
     const { issn } = req.params;
-    const journal = await JournalModel.findOne({ issn }, 'title issn publisher volumes abstract short_title coverImg');
+    const journal = await JournalModel.findOne(
+      { issn },
+      'journalTitle issn publisher volumes abstract short_title coverImg frequency start_year online_issn subject language format doi country website aimAndScope editorialBoard editorInChief'
+    );
+
     if (!journal) return res.status(404).json({ error: 'Journal not found' });
+
     res.json(journal);
   } catch (error) {
     res.status(500).json({ error: 'Error fetching journal', details: error.message });
   }
 };
 
+
+
 // Get volumes of a journal
 exports.getVolumesByISSN = async (req, res) => {
   try {
     const { issn } = req.params;
-    const journal = await JournalModel.findOne({ issn }, 'volumes');
+    const journal = await JournalModel.findOne({ issn }, 'journalTitle issn coverImg volumes ');
     if (!journal) return res.status(404).json({ error: 'Journal not found' });
-    res.json(journal.volumes);
+    res.json(journal);
   } catch (error) {
     res.status(500).json({ error: 'Error fetching volumes', details: error.message });
   }
@@ -320,7 +383,7 @@ exports.getVolumesByISSN = async (req, res) => {
 exports.getIssuesByVolume = async (req, res) => {
   try {
     const { issn, volumeNumber } = req.params;
-    const journal = await JournalModel.findOne({ issn }, 'volumes');
+    const journal = await JournalModel.findOne({ issn }, 'volumes  journalTitle coverImg ');
     if (!journal) return res.status(404).json({ error: 'Journal not found' });
 
     const volume = journal.volumes.find(v => v.volumeNumber === parseInt(volumeNumber));
@@ -351,34 +414,173 @@ exports.getPapersByIssue = async (req, res) => {
   }
 };
 
-module.exports.handleImageUpload = async (req, res) => {
+exports.getPaper = async(req, res) =>{
+  try{
+    const { issn, volumeNumber, issueNumber, paperNumber } = req.params;
+    const journal = await JournalModel.findOne({ issn }, 'volumes');
+    if (!journal) return res.status(404).json({ error: 'Journal not found' });
+
+    const volume = journal.volumes.find(v => v.volumeNumber === parseInt(volumeNumber));
+    if (!volume) return res.status(404).json({ error: 'Volume not found' });
+
+    const issue = volume.issues.find(i => i.issueNumber === parseInt(issueNumber));
+    if (!issue) return res.status(404).json({ error: 'Issue not found' });
+
+    const paper = issue.papers.find(p => p.paperNumber === parseInt(paperNumber));
+    if (!paper) return res.status(404).json({ error: 'paper not found' });
+
+    res.json(paper);
+    
+
+
+  }catch(error){
+    res.status(500).json({ error: 'Error fetching paper', details: error.message });
+  }
+}
+
+module.exports.handleFileUpload = async (req, res) => {
   try {
-    // Check if a file was uploaded
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "No file uploaded",
+      if (!req.file) {
+          return res.status(400).json({ success: false, message: "No file uploaded" });
+      }
+
+      console.log("Uploading file:", req.file.originalname);
+
+      // Upload to Cloudinary
+      const result = await fileUploadUtil(req.file.buffer, req.file.mimetype);
+
+      // Generate correct file URL
+      const fileUrl = result.secure_url.replace("/upload/", "/upload/f_auto,q_auto/");
+
+
+
+      console.log("Cloudinary File URL:", fileUrl);
+
+      res.json({
+          success: true,
+          url: fileUrl, // Return Cloudinary file URL
       });
-    }
-
-    // Convert file buffer to Base64
-    const b64 = req.file.buffer.toString("base64");
-    const url = `data:${req.file.mimetype};base64,${b64}`;
-
-    // Upload to Cloudinary
-    const result = await imageUploadUtil(url);
-
-    res.json({
-      success: true,
-      result,
-    });
   } catch (error) {
-    console.error("Upload Error:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Error occurred during image upload",
-    });
+      console.error("Upload Error:", error);
+      res.status(500).json({ success: false, message: "File upload failed" });
   }
 };
 
+exports.createVolume = async (req, res) => {
+  try {
+    const { issn } = req.params;
+    const { volumeNumber } = req.body;
+
+    // Find journal
+    let journal = await JournalModel.findOne({ issn });
+    if (!journal) {
+      return res.status(404).json({ error: "Journal not found" });
+    }
+
+    // Check if volume already exists
+    if (journal.volumes.some(v => v.volumeNumber == volumeNumber)) {
+      return res.status(400).json({ error: "Volume already exists" });
+    }
+
+    // Create new volume
+    const newVolume = { volumeNumber, issues: [] };
+    journal.volumes.push(newVolume);
+    await journal.save();
+
+    res.status(201).json({ message: "Volume created successfully", volumeNumber });
+  } catch (error) {
+    console.error("Error creating volume:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+exports.submitPaper = async (req, res) => {
+  try {
+    const { issn, volumeNumber, issueNumber } = req.params;
+    const paperData = req.body;
+
+    console.log("Paper Data:", paperData);
+
+    // Validate required fields
+    if (!paperData.paperTitle || !paperData.authors || paperData.authors.length === 0) {
+      return res.status(400).json({ error: "Title and authors are required." });
+    }
+
+    // Find the journal
+    let journal = await JournalModel.findOne({ issn });
+    if (!journal) {
+      return res.status(404).json({ error: "Journal not found" });
+    }
+
+    // Find the volume
+    let volume = journal.volumes.find(v => v.volumeNumber == volumeNumber);
+    if (!volume) {
+      return res.status(404).json({ error: "Volume not found" });
+    }
+
+    // Find the issue
+    let issue = volume.issues.find(i => i.issueNumber == issueNumber);
+    if (!issue) {
+      return res.status(404).json({ error: "Issue not found" });
+    }
+
+    // Generate paperNumber based on current length of papers array
+    const paperNumber = issue.papers.length + 1;
+
+    // Add paperNumber to paperData
+    const newPaper = { ...paperData, paperNumber };
+
+    // Add the new paper to the issue
+    issue.papers.push(newPaper);
+
+    // Save the updated journal document
+    await journal.save();
+
+    res.status(201).json({
+      message: "Paper submitted successfully",
+      paper: newPaper
+    });
+  } catch (error) {
+    console.error("Error submitting paper:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+exports.createIssue = async (req, res) => {
+  try {
+    const { issn, volumeNumber } = req.params;
+    const { issueNumber } = req.body;
+
+    // Find the journal by ISSN
+    let journal = await JournalModel.findOne({ issn });
+    if (!journal) {
+      return res.status(404).json({ error: "Journal not found" });
+    }
+
+    // Find the volume inside the journal
+    let volume = journal.volumes.find(v => v.volumeNumber == volumeNumber);
+    if (!volume) {
+      return res.status(404).json({ error: "Volume not found" });
+    }
+
+    // Check if issue already exists
+    let issue = volume.issues.find(i => i.issueNumber == issueNumber);
+    if (issue) {
+      return res.status(400).json({ error: "Issue already exists" });
+    }
+
+    // Create new issue and push it
+    const newIssue = { issueNumber, papers: [] };
+    volume.issues.push(newIssue);
+
+    // Save the updated journal document
+    await journal.save();
+
+    res.status(201).json({ message: "Issue created successfully", issue: newIssue });
+  } catch (error) {
+    console.error("Error creating issue:", error);
+    res.status(500).json({ error: error.message });
+  }
+};

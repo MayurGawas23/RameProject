@@ -54,6 +54,9 @@ export default function Profile({ user }) {
       <h1>Welcome, {user.username}!</h1>
       <p>Email: {user.email}</p>
       <p>Role: {user.role}</p>
+      <p>Full Name : {user.fullname}</p>
+      <p>Mobile NO.: {user.mobno}</p>
+      <p>Affiliation: {user.affiliation}</p>
     </div>
   );
 }

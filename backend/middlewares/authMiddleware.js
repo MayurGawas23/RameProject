@@ -18,7 +18,7 @@ module.exports.authUser = async (req, res, next) => {
         console.log("Decoded Payload:", isVerified);
 
         const userData = await UserModel.findOne({ email: isVerified.email });
-        console.log("User Data from DB:", userData);
+        console.log("User Data from DB:", userData); 
 
         if (!userData) {
             return res.status(404).json({ message: 'User not found' });
@@ -47,5 +47,15 @@ module.exports.isAdmin = (req, res, next) => {
         res.status(403).json({ message: 'Forbidden: Admin only' });
     }
 };
+
+module.exports.checkEditor = (req, res, next) => {
+  if (req.user?.role !== "editor") {
+    return res.status(403).json({ error: "Access denied. Only editors can perform this action." });
+  }
+  next();
+};
+
+
+
 
 

@@ -18,7 +18,8 @@ const editorialBoardSchema = new mongoose.Schema({
 
 // Schema for a paper
 const paperSchema = new mongoose.Schema({
-  title: String,
+  paperNumber: Number,
+  paperTitle: String,
   authors: [{
     name: String,
     email: String,
@@ -29,40 +30,51 @@ const paperSchema = new mongoose.Schema({
   references: [String],
   pages: String,
   doi: String,  // Ensure DOI is stored
-  publicationDate: String,
-  metadata: mongoose.Schema.Types.Mixed // Store entire metadata object
-});
+  publicationDate: { type: Date, default: Date.now }, 
+  indexTerms:[String],
+  pdf:String,
+  metadata: mongoose.Schema.Types.Mixed, // Store entire metadata object
+  type:String
+}, { timestamps: true }); // 
 
 
 // Schema for an issue
 const issueSchema = new mongoose.Schema({
   issueNumber: Number,
   papers: [paperSchema]
-});
+}, { timestamps: true });
 
 // Schema for a volume
 const volumeSchema = new mongoose.Schema({
   volumeNumber: Number,
+  fromToDate:String,
   issues: [issueSchema]
-});
+}, { timestamps: true });
 
 // Schema for a journal
 const journalSchema = new mongoose.Schema({
-  title: String,
-  short_title:String,
-  abstract: String, 
-  startYear: Number,
+  journalTitle: String,
+  short_title: String,
   issn: String,
   online_issn: String,
+  subject: String,
+  format: String,
+  publisher: String,
+  country: String,
+  abstract: String,
+  language: String,
+  doi: String,
+  frequency: String,
+  start_year: String,
+  website: String, // ✅ Added website
 
-  
   editorialBoard: [editorialBoardSchema],
   aimAndScope: {
-    description: String,
-    aims: [String]
+    description: String, // ✅ Ensure this matches the controller
+    topics: [String], // ✅ Array type to store topics
   },
   coverImg: String,
-  volumes: [volumeSchema]
+  volumes: [volumeSchema],
 });
 
 const JournalModel = mongoose.model('Journal', journalSchema);

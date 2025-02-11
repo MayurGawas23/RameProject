@@ -34,6 +34,9 @@ const Header = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullname, setFullname] = useState("");
+  const [mobno, setMobno] = useState("");
+  const [affiliation, setAffiliation] = useState("");
   const [error, setError] = useState("");
 
   // Handle form submission (Login or Register)
@@ -45,7 +48,7 @@ const Header = () => {
       : `${process.env.NEXT_PUBLIC_API_URL}/users/login`;
 
     const body = isRegister
-      ? { username, email, password }
+      ? { username, email, password , affiliation, mobno, fullname }
       : { username, password };
 
     const response = await fetch(url, {
@@ -66,27 +69,16 @@ const Header = () => {
 
   // State to handle hydration mismatch (client-side check)
   const [isClient, setIsClient] = useState(false);
+useEffect(() => { setIsClient(true); }, []);
+if (!isClient) { return <div>Loading...</div>; }
 
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) {
-    // Placeholder during client-side hydration
-    return (
-      <div className="w-full h-[118px] bg-gray-100 border-b border-gray-200">
-        <p className="text-center py-4">Loading...</p>
-      </div>
-    );
-  }
 
   return (
-    <header className="w-full px-4 lg:px-20 bg-gray-200 text-black border-b border-gray-200">
-      <div className="flex justify-between items-center h-[118px]">
+    <header className="lg:w-full md:w-full  border-b  mx-auto px-4 lg:px-60 bg-grady-200 text-black pt-1 border-gray-200">
+      <div className="flex justify-between items-center h-[80px]">
         {/* Logo Section */}
         <Link href="/" aria-label="RAME Publishers Home">
-          <div className="font-medium tracking-tighter text-[13px]">
+          <div className="">
             <Logo />
           </div>
         </Link>
@@ -103,43 +95,57 @@ const Header = () => {
           </div>
 
           {/* User Authentication */}
-          {isLoggedIn ? (
-            <div className="flex items-center gap-3">
-              {/* {router.pathname === "/journals" && (
-                <div className="flex items-center gap-3">
-                  {user.role === "author" && (
-                    <Link href="/submit-article" className="mx-2 bg-[#ffa73b] p-1 rounded-sm px-2 text-white font-medium">
-                      Submit Article
-                    </Link>
-                  )}
-                  {user.role === "editor" && (
-                    <Link href="/assign-reviewers" className="mx-2 bg-[#ffa73b] p-1 rounded-sm px-2 text-white font-medium">
-                      Assign Reviewers
-                    </Link>
-                  )}
-                  {user.role === "reviewer" && (
-                    <Link href="/submit-review" className="mx-2 bg-[#ffa73b] p-1 rounded-sm px-2 text-white font-medium">
-                      Submit Review
-                    </Link>
-                  )}
-                </div>
-              )} */}
+            {isLoggedIn ? (
+              <div className="flex items-center gap-3">
+                {/* {router.pathname.startsWith("/journals") &&  (
+                  <div className="flex items-center gap-3">
+                    {user.role === "author" && (
+                      <Link href="/submit-paper" className="mx-2 bg-[#ffa73b] p-1 rounded-sm px-2 text-white font-medium">
+                        Submit paper
+                      </Link>
+                    )}
+                    {user.role === "editor" && (
+                      <Link href="/assign-reviewers" className="mx-2 bg-[#ffa73b] p-1 rounded-sm px-2 text-white font-medium">
+                        Assign Reviewers
+                      </Link>
+                    )}
+                    {user.role === "reviewer" && (
+                      <Link href="/submit-review" className="mx-2 bg-[#ffa73b] p-1 rounded-sm px-2 text-white font-medium">
+                        Submit Review
+                      </Link>
+                    )}
+                  </div>
+                )} */}
 
               <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger >
                   <Avatar className="bg-black">
                     <AvatarFallback className="bg-black text-white font-semibold text-2xl flex items-center justify-center">
                       {user?.username?.[0]?.toUpperCase() || ""}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-[200px] p-2">
+                <DropdownMenuContent className="w-[250px] p-2">
                   <DropdownMenuItem
-                    onClick={() => router.push('/profile')}
+                    // onClick={() => router.push('/profile')}
                     className="flex gap-2 items-center hover:bg-zinc-100 rounded-md px-3 py-2 cursor-pointer"
                   >
                     <User className="h-5 w-5" />
-                    My Profile
+                    {user.role === "author" && (
+             
+                        <p onClick={() => router.push('/editorsdb')}>My profile</p>
+                  
+                    )}
+                    {user.role === "editor" && (
+                      
+                        <p  onClick={() => router.push('/editorsdb')}>Editor DashBoard</p>
+                    )}
+                     {user.role === "reviewer" && (
+                     
+                        <p onClick={() => router.push('/reviewlist')}>Review Papers</p>
+                  
+                    )}
+                      
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => router.push('/logout')}
@@ -155,7 +161,7 @@ const Header = () => {
             <Dialog>
             <DialogTrigger>
               <Button className="bg-[#1f7177] px-6 hidden lg:block hover:bg-[#298b92]">
-               Login
+               Login/Register
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
@@ -166,6 +172,14 @@ const Header = () => {
                 {error && <p className="text-red-500">{error}</p>}
                 <form onSubmit={handleSubmit}>
                   {isRegister && (
+                     <>
+                      <Input
+                      className="mb-4"
+                      type="text"
+                      placeholder="Full Name"
+                      value={fullname}
+                      onChange={(e) => setFullname(e.target.value)}
+                      />
                     <Input
                     className="mb-4"
                     type="email"
@@ -173,6 +187,21 @@ const Header = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     />
+                     <Input
+                    className="mb-4"
+                    type="text"
+                    placeholder="WhatsApp No. with Country Code"
+                    value={mobno}
+                    onChange={(e) => setMobno(e.target.value)}
+                    />
+                     <Input
+                    className="mb-4"
+                    type="text"
+                    placeholder="Affiliation"
+                    value={affiliation}
+                    onChange={(e) => setAffiliation(e.target.value)}
+                    />
+                     </>
                   )}
                   <Input
                     
@@ -189,7 +218,7 @@ const Header = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-                  <Button type="submit">{isRegister ? "Register" : "Login"}</Button>
+                  <Button type="submit" className="bg-[#1f7177] hover:bg-[#298b92]">{isRegister ? "Register" : "Login"}</Button>
                 </form>
               </div>
               <DialogFooter>

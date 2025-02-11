@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Teko:wght@300..700&display=swap');
+
+
+
+
+
 @font-face{
     font-family: myfont;
     src: url(/fonts/myfont-Regular.woff2)
@@ -12,8 +18,95 @@
     font-family: roboto;
     src: url(/fonts/Roboto-Light.woff2)
 }
+
+@font-face{
+  font-family:condensed-bold;
+  src:url(/fonts/BarlowCondensed-Bold.ttf)
+}
+
+@font-face{
+  font-family:condensed-semibold;
+  src:url(/fonts/BarlowCondensed-SemiBold.ttf)
+}
+
+@font-face{
+  font-family:condensed-medium;
+  src:url(/fonts/BarlowCondensed-Medium.ttf)
+}
+
+@font-face{
+  font-family:condensed-regular;
+  src:url(/fonts/BarlowCondensed-Regular.ttf)
+}
+
+@font-face{
+  font-family:oswal-semibold;
+  src:url(/fonts/Oswald-SemiBold.ttf)
+}
+
+@font-face{
+  font-family:oswal-bold;
+  src:url(/fonts/Oswald-Bold.ttf)
+}
+
+@font-face{
+  font-family:academia;
+  src:url(/fonts/academicons.b9bbaa2c.ttf)
+}
+
+@font-face{
+  font-family:fabrands;
+  src:url(/fonts/fa-brands-400.87a84e7a.woff2)
+}
+
+@font-face{
+  font-family:poppins-bold;
+  src:url(/fonts/Poppins-Bold.ttf)
+}
+
+@font-face{
+  font-family:poppins-extrabold;
+  src:url(/fonts/Poppins-ExtraBold.ttf)
+}
+
+@font-face{
+  font-family:poppins-extralight;
+  src:url(/fonts/Poppins-ExtraLight.ttf)
+}
+
+@font-face{
+  font-family:poppins-light;
+  src:url(/fonts/Poppins-Light.ttf)
+}
+@font-face{
+  font-family:poppins-semibold;
+  src:url(/fonts/Poppins-SemiBold.ttf)
+}
+
+@font-face{
+  font-family:poppins-medium;
+  src:url(/fonts/Poppins-Medium.ttf)
+}
+
+@font-face{
+  font-family:poppins-regular;
+  src:url(/fonts/Poppins-Regular.ttf)
+}
+
+@font-face{
+  font-family:poppins-thin;
+  src:url(/fonts/Poppins-Thin.ttf)
+}
+
+
+
+
+
 html, body{
-    font-family:myfont  
+    font-family:myfont  ;
+    background-color:#FAF9F6  ;
+    scroll-behavior:smooth;
+    
 }
 @layer base {
   :root {
@@ -78,3 +171,31 @@ html, body{
     @apply bg-background text-foreground;
     }
 }
+
+#card-1 .card-inner{
+  background-color : red
+}
+#card-2 .card-inner{
+  background-color : green
+}
+#card-3 .card-inner{
+  background-color : blue
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

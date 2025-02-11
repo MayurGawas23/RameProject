@@ -2,6 +2,7 @@ import Brands from '@/components/Brands';
 import Footer from '@/components/Footer';
 import ForAuthors from '@/components/ForAuthors';
 import Header from '@/components/Header';
+import Link from 'next/link';
 import React from 'react';
 
 const JoinUs = () => {
@@ -50,28 +51,32 @@ const JoinUs = () => {
             <li>
               International Journal of Analytical, Experimental, and Finite
               Element Analysis{' '}
+              <Link href={'/docs/IJAEFEA_Membership.doc'}>
               <span className="text-blue-700 hover:underline cursor-pointer">
                 (click here)
-              </span>
+              </span></Link>
             </li>
             <li>
               International Journal of Computational and Electronics Aspects in
               Engineering{' '}
+              <Link href={'/docs/IJCEAE_Membership.doc'}>
               <span className="text-blue-700 hover:underline cursor-pointer">
                 (click here)
-              </span>
+              </span></Link>
             </li>
             <li>
               Journal of Thermal and Fluid Science{' '}
+              <Link href={'/docs/JPIE_Membership.doc'}>
               <span className="text-blue-700 hover:underline cursor-pointer">
                 (click here)
-              </span>
+              </span></Link>
             </li>
             <li>
               Journal of Production and Industrial Engineering{' '}
+              <Link href={'/docs/JTFS_Membership.doc'}>
               <span className="text-blue-700 hover:underline cursor-pointer">
                 (click here)
-              </span>
+              </span></Link>
             </li>
           </ul>
         </div>

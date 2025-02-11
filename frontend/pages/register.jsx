@@ -8,6 +8,9 @@ const Register = () => {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [affiliation, setAffiliation] = useState("");
+    const [fullname, setFullname] = useState("")
+    const [mobno, setMobno] = useState("")
     const [error, setError] = useState("");
     const router = useRouter();
 
@@ -20,7 +23,7 @@ const Register = () => {
           headers: {
               'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email , username, password }),
+          body: JSON.stringify({ email , username, password , affiliation, mobno , fullname }),
       });
 
       const data = await response.json();

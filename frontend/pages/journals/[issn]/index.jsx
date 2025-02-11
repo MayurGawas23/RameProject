@@ -1,7 +1,8 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { BookText, LibraryBig, Mail, Telescope, Users } from "lucide-react";
+import { ArrowLeft, BookText, LibraryBig, Mail, Telescope, Users } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 // pages/journals/[issn].js
 
@@ -49,6 +50,8 @@ export const getServerSideProps = async (context) => {
 
 
 const JournalDetails = ({ journal, error }) => {
+
+  const router = useRouter()
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -58,61 +61,69 @@ const JournalDetails = ({ journal, error }) => {
   }
 
   return (
-    <div className="w-full h-screen">
+    <div className="w-full ">
       <Header />
-      <div className="flex w-full h-full">
-        <div className="w-[80%] h-full bg-blue-50">
-          <div className="h-[200px] w-full bg-yellow-200 flex justify-center items-center gap-10 p-4 border-b border-black ">
-            <div className="h-[170px] w-[120px] p-1 bg-white">
+      <div className="flex-col w-full h-full ">
+      <Link
+            href={`/journals/`}
+            className="text-blue-500 hover:underline  mt-4 flex p-2 px-[200px]"
+          >
+           <ArrowLeft/> Back 
+          </Link>
+        <div className="w-full h-full mx-auto bg-bleue-50">
+        <div onClick={()=> router.push(`/journals/${journal.issn}`)} className="h-[200px] bg-reed-300 w-full  flex justify-center items-center gap-10 p-4 cursor-pointer ">
+            <div className="h-[170px] w-[120px] p-1 bg-gray-200">
             <img src={journal.coverImg} className="w-full h-full"></img>
             </div>
-            <h1 className="text-3xl font-bold">{journal.title}</h1>
+          <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold">{journal.journalTitle}</h1>
+          <h1 className="font-bold text-zinc-500">ISSN: {journal.issn}</h1>
           </div>
-          <div className="h-[100px] w-full bg-gray-300 flex items-center justify-around">
-            <h1      className="flex gap-2"><Users />Editorial Board</h1>
-            <h1 className="flex gap-2"><Telescope />Aim & Scope</h1>
-            <h1 className="flex gap-2"><BookText />Submit Manuscript</h1>
-            <Link href={`/journals/${journal.issn}/volumes`} className="flex gap-2"><LibraryBig />Archives</Link>
-            <h1 className="flex gap-2"><Mail />Contact us</h1>
           </div>
-
-          <div>
-            <h2>{journal.title}</h2>
-            <p><strong>ISSN:</strong> {journal.issn}</p>
-            <p><strong>{journal.title}({journal.short_title})</strong> {journal.abstract}</p>
+          <div className="h-[40px] w-full  flex items-center justify-center mb-4  ">
+            <Link  href={`/journals/${journal.issn}/editorialboard`}    className="flex gap-2  border-black px-10  text-blue-600 hover:underline cursor-pointer h-full items-center "><Users />Editorial Board</Link>
+            <Link href={`/journals/${journal.issn}/aim&scope`} className="flex gap-2  border-black px-10  text-blue-600 hover:underline cursor-pointer  h-full items-center "  ><Telescope />Aim & Scope</Link>
+            <Link href={`/journals/${journal.issn}/submitpaper`} className="flex gap-2  border-black px-10  text-blue-600 hover:underline cursor-pointer h-full items-center "   ><BookText />Submit Manuscript</Link>
+            <Link href={`/journals/${journal.issn}/volumes`} className="flex gap-2  border-black px-10  text-blue-600 hover:underline cursor-pointer h-full items-center "  ><LibraryBig />Archives</Link>
+            <Link href={`/contact`} className="flex gap-2 px-10 text-blue-600 hover:underline  cursor-pointer h-full items-center "  ><Mail />Contact us</Link>
+          </div>
+ 
+          <div className="w-[80%] mx-auto border-t-2 p-4 px-[100px]">
+            {/* <h2>{journal.journalTitle}</h2> */}
+            {/* <p><strong>ISSN:</strong> {journal.issn}</p> */}
+            <p className="leading-[30px] mb-4"><strong>{journal.journalTitle} ({journal.short_title})</strong> {journal.abstract}</p>
             <p><strong>{journal.short_title} Features:</strong> </p>
-            <li>Plagiarism:All submitted paper is check by well known iThenticate Plagiarism software.</li>
-            <li>DOI: After acceptance, a worldwide unique DOI Number is assigned to paper which is indexed by Crossref.</li>
-            <li>Open Access: jtfs is part of online open access, which allows authors to access published article anytime and anywhere. All articles can be accessed for free.</li>
-            <h1>Journal information</h1>
-            <h1>Title: {journal.title}</h1>
-            <h1>Short title : {journal.short_title}</h1>
-            <h1>ISSN: {journal.issn}</h1>
-            <h1>Frequency: </h1>
-            <h1>Publisher: {journal.publisher} , India</h1>
-            <h1>Editor in Chief: </h1>
-            <h1>Statring year: </h1>
-            <h1>Subject : </h1>
-            <h1>Language: </h1>
-            <h1>Publication Format</h1>
+           <div className="leading-[30px]">
+           <li><span className="font-bold">Plagiarism:</span> All submitted paper is check by well known iThenticate Plagiarism software.</li>
+            <li><span className="font-bold">DOI:</span> After acceptance, a worldwide unique DOI Number is assigned to paper which is indexed by Crossref.</li>
+            <li><span className="font-bold">Open Access:</span> jtfs is part of online open access, which allows authors to access published article anytime and anywhere. All articles can be accessed for free.</li>
+           </div>
+     <div className="p-2 mb-8">
+     <h1 className="font-semibold text-lg mb-2">Journal information</h1>
+            <h1 className=" p-2 ">Title: {journal.journalTitle}</h1>
+            <h1 className="p-2 border-b bg-zinc-200">Short Title : {journal.short_title}</h1>
+            <h1 className=" p-2 ">ISSN: {journal.issn}</h1>
+            <h1 className="p-2 border-b bg-zinc-200">Frequency: </h1>
+            <h1 className=" p-2 ">Publisher: {journal.publisher} , {journal.country}</h1>
+            <h1 className="p-2 border-b bg-zinc-200">Editor in Chief: </h1>
+            <h1 className=" p-2 ">Starting year: </h1>
+            <h1 className="p-2 border-b bg-zinc-200">Subject : {journal.subject}</h1>
+            <h1 className=" p-2 ">Language: {journal.language} </h1>
+            <h1 className="p-2 border-b bg-zinc-200">Publication Format</h1>
 
-            <h1>Email Id: </h1>
-            <h1>website</h1>
+            <h1 className=" p-2  ">Email Id: </h1>
+            <h1 className="p-2 border-b bg-zinc-200">website</h1>
+     </div>
+
+     <Link href={'/copyright'} className="font-medium text-lg mb-2 text-blue-600 hover:underline cursor-pointer">Copyright & Licensing</Link>
 
             {/* Add more fields as needed */}
           </div>
-          <Link
-            href={`/journals/`}
-            className="text-blue-500 hover:underline block mt-4"
-          >
-            Back to all journals
-          </Link>
-        </div>
-        <div className="w-[25%] h-full bg-red-300">
-
-        </div>
-      </div>
       <Footer />
+         
+        </div>
+     
+      </div>
     </div>
   );
 };

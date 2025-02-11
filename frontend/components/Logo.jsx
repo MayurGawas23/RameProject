@@ -14,14 +14,14 @@ const Logo = () => {
         <img
           src="/ramelogo.png"
           alt="RAME Publishers Logo"
-          className="w-20 sm:w-24 md:w-28 h-auto" // Adjust image size responsively
+          className="w-20 sm:w-24 md:w-20 h-auto" // Adjust image size responsively
         />
       </div>
 
       {/* Logo Text */}
       <div>
-        <h1 className="tracking-wider text-sm sm:text-base md:text-2xl font-semibold text-[#145E63]">
-          <span className="text-[#C7740E] text-2xl sm:text-3xl md:text-5xl font-extrabold">
+        <h1 className="font-[condensed-medium] tracking-wider text-sm sm:text-base md:text-2xl font-semibold text-[#145E63]">
+          <span className="font-[oswal-semibold] text-[#C7740E] lg:text-[42px] sm:text-3xl md:text-5xl font-extrabold">
             RAME
           </span>
           PUBLISHERS

@@ -1,10 +1,10 @@
-const express = require("express");
-const { submitReview } = require("../controllers/reviewController");
-const authMiddleware = require('../middlewares/authMiddleware')
+// const express = require("express");
+// const { submitReview } = require("../controllers/reviewController");
+// const authMiddleware = require('../middlewares/authMiddleware')
 
-const router = express.Router();
+// const router = express.Router();
 
-router.post("/submit", authMiddleware.authUser, submitReview);
+// router.post("/submit", authMiddleware.authUser, submitReview);
 
-module.exports = router;
+// module.exports = router;
 

@@ -11,13 +11,16 @@ export const AuthProvider = ({ children }) => {
     email: "",
     username: "",
     role: "",
+    fullname:"",
+    affiliation:"",
+    mobno:""
   });
   const router = useRouter();
 
   const logoutUser = () => {
     Cookies.remove("token"); // Clear token from cookies
     setToken(null); // Reset the token state
-    setUser({ email: "", username: "", role: "" }); // Clear user data
+    setUser({ email: "", username: "", role: "", fullname:"", affiliation:"", mobno:"" }); // Clear user data
     router.push("/"); // Redirect to login page
   };
 

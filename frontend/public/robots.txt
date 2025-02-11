@@ -1,0 +1,14 @@
+# *
+User-agent: *
+Allow: /
+
+# *
+User-agent: *
+Disallow: /admin
+Disallow: /dashboard
+
+# Host
+Host: https://rame.org.in
+
+# Sitemaps
+Sitemap: https://rame.org.in/sitemap.xml

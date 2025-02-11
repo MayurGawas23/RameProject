@@ -11,13 +11,14 @@ const path = require('path')
 app.use(express.static(path.join(__dirname, "public")));
 const userRoutes = require('./routes/userRoutes');
 const contactRoutes = require('./routes/contactRoutes');
-const articleRoutes = require("./routes/articleRoutes");
+const paperRoutes = require("./routes/paperRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 
 app.use(cors({
-   origin: '*', // Allow requests from your frontend React app
+   origin: process.env.FRONTEND_URL, // Allow requests from your frontend React app
    methods: 'GET,POST,PUT,DELETE', // Allow the methods you use
-   allowedHeaders: 'Content-Type,Authorization', // Allow necessary headers
+   allowedHeaders: 'Content-Type,Authorization',
+   credentials: true, // Allow necessary headers
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended:true }));
@@ -45,8 +46,8 @@ app.use('/users', userRoutes);
 app.use('/form', contactRoutes);
 app.use('/admin', AdminRoutes)
 app.use('/api', journalRoutes);
-app.use("/api/articles", articleRoutes);
-app.use("/api/reviews", reviewRoutes);
+app.use("/api/papers", paperRoutes);
+// app.use("/api/reviews", reviewRoutes);
 
 
 
