@@ -11,7 +11,9 @@ import { ArrowLeft } from "lucide-react";
 
 const EditorDashboard = ({ papers, token }) => {
   const router = useRouter();
+  
   const { paperId } = router.query; // Get paper from URL query
+  console.log("p",paperId)
   const [selectedPaper, setSelectedPaper] = useState(null);
   const [finalDecision, setFinalDecision] = useState("");
   const [message, setMessage] = useState("");

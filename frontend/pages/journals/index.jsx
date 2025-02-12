@@ -24,9 +24,9 @@ const Index = (props) => {
         <div className="grid lg:grid-cols-1 sm:grid-cols-1 gap-8 w-[70%]  ">
           {props.journals.map((journal) => ( // Limit displayed journals to 6 for better fit
             <div
-              key={journal.issn}
+              key={journal.short_title}
               className="bg-zih nc-200 p-4 border bg-white rounded shadow-md flex  justify-start items-center cursor-pointer"
-              onClick={() => router.push(`/journals/${journal.issn}`)}
+              onClick={() => router.push(`/journals/${journal.short_title}`)}
             >
               <div className="h-[250px] bg-inc-200 p-1 flex justify-start items-start w-[20%] transition hover:scale-[1.05]">
                 <div className="h-full w-auto bg-white border-2 border-zinc-400 p-1">
@@ -42,19 +42,19 @@ const Index = (props) => {
 
               <div className="mt-4 border-t p-2 flex justify-around">
               <Link
-                  href={`/journals/${journal.issn}`} className="text-blue-600 hover:underline text-m flex  mt-2"              >
+                  href={`/journals/${journal.short_title}`} className="text-blue-600 hover:underline text-m flex  mt-2"              >
                   View Details<ArrowUpRight className="w-5"/>
                 </Link>
                 <Link
-                  href={`/journals/${journal.issn}/aim&scope`} className="text-blue-600 hover:underline text-m flex  mt-2"              >
+                  href={`/journals/${journal.short_title}/aim&scope`} className="text-blue-600 hover:underline text-m flex  mt-2"              >
                   Aim & Scope<ArrowUpRight className="w-5"/>
                 </Link>
                 <Link
-                  href={`/journals/${journal.issn}/volumes`} className="text-blue-600 hover:underline text-m flex  mt-2"              >
+                  href={`/journals/${journal.short_title}/volumes`} className="text-blue-600 hover:underline text-m flex  mt-2"              >
                   Archives<ArrowUpRight className="w-5"/>
                 </Link>
                 <Link
-                  href={`/journals/${journal.issn}/submitpaper`} className="text-blue-600 hover:underline text-m flex  mt-2"              >
+                  href={`/journals/${journal.short_title}/submitpaper`} className="text-blue-600 hover:underline text-m flex  mt-2"              >
                   Submit a Paper<ArrowUpRight className="w-5"/>
                 </Link>
               </div>

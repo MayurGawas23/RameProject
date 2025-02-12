@@ -126,7 +126,7 @@ const SubmitJournal = () => {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.journalTitle || !formData.issn || !formData.publisher) {
+    if (!formData.journalTitle || !formData.short_title || !formData.publisher) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -146,8 +146,8 @@ const SubmitJournal = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input name="short_title" placeholder="Short Title" value={formData.short_title} onChange={handleChange} />
             <div className="flex gap-2">
-              <Input name="issn" placeholder="ISSN *" value={formData.issn} onChange={handleChange} required />
-              <Input name="online_issn" placeholder="ONLINE ISSN (if available) *" value={formData.online_issn} onChange={handleChange} required />
+              <Input name="issn" placeholder="ISSN *" value={formData.issn} onChange={handleChange}  />
+              <Input name="online_issn" placeholder="ONLINE ISSN (if available) *" value={formData.online_issn} onChange={handleChange}  />
             </div>
           </div>
 

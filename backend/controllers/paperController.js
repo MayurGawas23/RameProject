@@ -2,10 +2,10 @@ const PaperModel = require("../models/PaperModel");
 
 // Submit an paper
 module.exports.submitPaper = async (req, res) => {
-  const { paperTitle, abstract, indexTerms, references, pages, doi, publicationDate, journalId, journalName ,pdf, suggestedreviewers , coauthors ,type } = req.body;
+  const { paperTitle, abstract, indexTerms, references, pages, doi, publicationDate, journalId, journalName  ,pdf, suggestedreviewers , coauthors ,type } = req.body;
   const { username, email , mobno, affiliation } = req.user; 
   // const fullMobNo = `${mobcode}${mobno}`;// Assuming authentication middleware
-
+  console.log("JID",journalId)
   if (!username || !email) {
     return res.status(400).json({ error: "User information is missing" });
   }
@@ -24,12 +24,13 @@ module.exports.submitPaper = async (req, res) => {
       pages,
       doi,
       publicationDate,
-      journalISSN: journalId,  // Reference to the Journal model
+      jshorttitle: journalId,  // Reference to the Journal model
       journalName,         // Journal name stored as string
       pdf,
       suggestedreviewers,
       coauthors,    
-      type
+      type,
+      
      
 
     });

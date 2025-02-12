@@ -8,14 +8,14 @@ import Header from '@/components/Header';
 
 export const getServerSideProps = async (context) => {
   try {
-    const { issn, volumeNumber, issueNumber, paperNumber } = context.params;
+    const { short_title, volumeNumber, issueNumber, paperNumber } = context.params;
 
-    console.log(`Fetching Paper: ISSN=${issn}, Volume=${volumeNumber}, Issue=${issueNumber}, Paper=${paperNumber}`);
+    console.log(`Fetching Paper: ISSN=${short_title}, Volume=${volumeNumber}, Issue=${issueNumber}, Paper=${paperNumber}`);
 
     // Fetch journal details and specific paper concurrently
     const [paperResponse, journalResponse] = await Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${issn}/volumes/${volumeNumber}/issues/${issueNumber}/papers/${paperNumber}`),
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${issn}`)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${short_title}/volumes/${volumeNumber}/issues/${issueNumber}/papers/${paperNumber}`),
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${short_title}`)
     ]);
 
     // Check if both responses are valid
@@ -72,12 +72,12 @@ const Paper = ({ data, journal, volumeNumber, issueNumber, error }) => {
       <Header />
       <div className="flex flex-col ">
         <Link
-          href={`/journals/${journal.issn}/volumes`}
+          href={`/journals/${journal.short_title}/volumes`}
           className="text-blue-500 hover:underline  mt-4 inline-flex bg-bleue-200  pl-[80px]"
         >
           <ArrowLeft /> Back
         </Link>
-        <div onClick={() => router.push(`/journals/${journal.issn}`)} className="h-[200px] border-b-2 bg-reed-300 mx-auto   flex justify-center items-center gap-10 p-4 cursor-pointer ">
+        <div onClick={() => router.push(`/journals/${journal.short_title}`)} className="h-[200px] border-b-2 bg-reed-300 mx-auto   flex justify-center items-center gap-10 p-4 cursor-pointer ">
           <div className="h-[170px] w-[120px] p-1 bg-gray-200">
             <img src={journal.coverImg} className="w-full h-full"></img>
           </div>

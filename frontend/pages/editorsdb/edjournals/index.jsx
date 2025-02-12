@@ -29,7 +29,7 @@ const Index = (props) => {
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-8 w-[80%] ">
         {props.journals.map((journal) => ( // Limit displayed journals to 6 for better fit
           <div
-            key={journal.issn}
+            key={journal.short_title}
             className="bg-zinc-200 p-4  rounded shadow-md flex flex-col justify-center items-center"
           >
             <div className="h-[250px] bg-zinc-200 p-1 flex justify-center items-center w-full transition hover:scale-[1.05]">
@@ -44,7 +44,7 @@ const Index = (props) => {
               </div>
 
               {/* Edit Button */}
-              <Link href={`/editorsdb/edjournals/${journal.issn}`} >
+              <Link href={`/editorsdb/edjournals/${journal.short_title}`} >
                 <Button className="text-white bg-blue-500 hover:bg-blue-600 mt-2">
                   Edit Journal Details
                 </Button>

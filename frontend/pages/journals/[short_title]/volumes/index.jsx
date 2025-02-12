@@ -9,12 +9,12 @@ import { useRouter } from "next/router";
   // const context = context.params
   // console.log("context", context.params)
 
-      const { issn } = context.params; // Extract the ISSN from the URL
-      console.log("issn", issn)
+      const { short_title } = context.params; // Extract the ISSN from the URL
+      console.log("issn", short_title)
 
     
       try {
-        const data = await(await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${issn}/volumes`)).json();
+        const data = await(await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${short_title}/volumes`)).json();
                   // await(await fetch)(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${issn}`)
         
       //   const data = await response.json(); // Parse the response as JSON
@@ -30,7 +30,7 @@ import { useRouter } from "next/router";
           props: {
             // journal:data,
             journal: data, // Pass the journal object as a prop
-            issn
+            short_title
           },
         };
       } catch (error) {
@@ -47,7 +47,7 @@ import { useRouter } from "next/router";
     };
     
 
-    const Index = ({  journal,issn }) => {
+    const Index = ({  journal,short_title }) => {
       console.log(journal.volumes)
 
       const router = useRouter()
@@ -55,13 +55,13 @@ import { useRouter } from "next/router";
         <div className="grid min-h-screen grid-rows-[auto_1fr_auto] ">
           <Header />
           <Link
-            href={`/journals/${issn}`}
+            href={`/journals/${short_title}`}
             className="text-blue-500 hover:underline  mt-4 flex p-2 px-[200px]"
           >
            <ArrowLeft/> Back 
           </Link>
         <div className="w-full h-full mx-auto bg-bleue-50">
-        <div onClick={()=> router.push(`/journals/${issn}`)} className="h-[200px] bg-reed-300 w-full  flex justify-center items-center gap-10 p-4 cursor-pointer ">
+        <div onClick={()=> router.push(`/journals/${short_title}`)} className="h-[200px] bg-reed-300 w-full  flex justify-center items-center gap-10 p-4 cursor-pointer ">
             <div className="h-[170px] w-[120px] p-1 bg-gray-200">
             <img src={journal.coverImg} className="w-full h-full"></img>
             </div>
@@ -79,9 +79,9 @@ import { useRouter } from "next/router";
           </div> */}
           <main className="p-6 w-[60%] mx-auto">
           
-            <h1 className="text-2xl font-bold mb-4">Volumes of ISSN: {issn}</h1>
+            <h1 className="text-2xl font-bold mb-4">Volumes of ISSN: {short_title}</h1>
             <div className="grid grid-cols-1 gap-6">
-              {journal.volumes.map((vol) => (
+              {journal.volumes?.map((vol) => (
                 <div key={vol.volumeNumber} className="bg-white p-4 rounded shadow">
                   <h2 className="text-xl font-semibold mb-2 border-b">Volume {vol.volumeNumber}</h2>
                   {vol.issues && vol.issues.length > 0 ? (
@@ -104,7 +104,7 @@ import { useRouter } from "next/router";
                         return (
                           <li key={issue.issueNumber} className="flex items-center justify-between">
                             <Link
-                              href={`/journals/${issn}/volumes/${vol.volumeNumber}/issues/${issue.issueNumber}/papers`}
+                              href={`/journals/${short_title}/volumes/${vol.volumeNumber}/issues/${issue.issueNumber}/papers`}
                               className="text-blue-500 hover:underline"
                             >
                               Issue {issue.issueNumber}

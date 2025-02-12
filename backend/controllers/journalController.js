@@ -85,14 +85,14 @@ module.exports.getMyJournals = async (req, res) => {
 module.exports.updateJournal = async (req, res) => {
 
     try {
-      const { issn } = req.params;
+      const { short_title } = req.params;
       const updateData = req.body;
   
-      console.log("Updating Journal - ISSN:", issn);
+      console.log("Updating Journal - ISSN:", short_title);
       console.log("Update Data:", updateData);
   
       const updatedJournal = await JournalModel.findOneAndUpdate(
-        { issn: issn },
+        { short_title: short_title },
         { $set: updateData },
         { new: true, runValidators: true }
       );
@@ -351,9 +351,9 @@ exports.getAllJournals = async (req, res) => {
 // Get a specific journal by ISSN
 exports.getJournalByISSN = async (req, res) => {
   try {
-    const { issn } = req.params;
+    const { short_title } = req.params;
     const journal = await JournalModel.findOne(
-      { issn },
+      { short_title },
       'journalTitle issn publisher volumes abstract short_title coverImg frequency start_year online_issn subject language format doi country website aimAndScope editorialBoard editorInChief'
     );
 
@@ -370,8 +370,8 @@ exports.getJournalByISSN = async (req, res) => {
 // Get volumes of a journal
 exports.getVolumesByISSN = async (req, res) => {
   try {
-    const { issn } = req.params;
-    const journal = await JournalModel.findOne({ issn }, 'journalTitle issn coverImg volumes ');
+    const { short_title } = req.params;
+    const journal = await JournalModel.findOne({ short_title }, 'journalTitle issn coverImg volumes ');
     if (!journal) return res.status(404).json({ error: 'Journal not found' });
     res.json(journal);
   } catch (error) {
@@ -382,8 +382,8 @@ exports.getVolumesByISSN = async (req, res) => {
 // Get issues of a specific volume
 exports.getIssuesByVolume = async (req, res) => {
   try {
-    const { issn, volumeNumber } = req.params;
-    const journal = await JournalModel.findOne({ issn }, 'volumes  journalTitle coverImg ');
+    const { short_title, volumeNumber } = req.params;
+    const journal = await JournalModel.findOne({ short_title }, 'volumes  journalTitle coverImg ');
     if (!journal) return res.status(404).json({ error: 'Journal not found' });
 
     const volume = journal.volumes.find(v => v.volumeNumber === parseInt(volumeNumber));
@@ -398,8 +398,8 @@ exports.getIssuesByVolume = async (req, res) => {
 // Get papers of a specific issue
 exports.getPapersByIssue = async (req, res) => {
   try {
-    const { issn, volumeNumber, issueNumber } = req.params;
-    const journal = await JournalModel.findOne({ issn }, 'volumes');
+    const { short_title, volumeNumber, issueNumber } = req.params;
+    const journal = await JournalModel.findOne({ short_title }, 'volumes');
     if (!journal) return res.status(404).json({ error: 'Journal not found' });
 
     const volume = journal.volumes.find(v => v.volumeNumber === parseInt(volumeNumber));
@@ -416,8 +416,8 @@ exports.getPapersByIssue = async (req, res) => {
 
 exports.getPaper = async(req, res) =>{
   try{
-    const { issn, volumeNumber, issueNumber, paperNumber } = req.params;
-    const journal = await JournalModel.findOne({ issn }, 'volumes');
+    const { short_title, volumeNumber, issueNumber, paperNumber } = req.params;
+    const journal = await JournalModel.findOne({ short_title }, 'volumes');
     if (!journal) return res.status(404).json({ error: 'Journal not found' });
 
     const volume = journal.volumes.find(v => v.volumeNumber === parseInt(volumeNumber));
@@ -468,11 +468,11 @@ module.exports.handleFileUpload = async (req, res) => {
 
 exports.createVolume = async (req, res) => {
   try {
-    const { issn } = req.params;
+    const { short_title } = req.params;
     const { volumeNumber } = req.body;
 
     // Find journal
-    let journal = await JournalModel.findOne({ issn });
+    let journal = await JournalModel.findOne({ short_title });
     if (!journal) {
       return res.status(404).json({ error: "Journal not found" });
     }
@@ -497,7 +497,7 @@ exports.createVolume = async (req, res) => {
 
 exports.submitPaper = async (req, res) => {
   try {
-    const { issn, volumeNumber, issueNumber } = req.params;
+    const { short_title, volumeNumber, issueNumber } = req.params;
     const paperData = req.body;
 
     console.log("Paper Data:", paperData);
@@ -508,7 +508,7 @@ exports.submitPaper = async (req, res) => {
     }
 
     // Find the journal
-    let journal = await JournalModel.findOne({ issn });
+    let journal = await JournalModel.findOne({ short_title });
     if (!journal) {
       return res.status(404).json({ error: "Journal not found" });
     }
@@ -550,11 +550,11 @@ exports.submitPaper = async (req, res) => {
 
 exports.createIssue = async (req, res) => {
   try {
-    const { issn, volumeNumber } = req.params;
+    const { short_title, volumeNumber } = req.params;
     const { issueNumber } = req.body;
 
     // Find the journal by ISSN
-    let journal = await JournalModel.findOne({ issn });
+    let journal = await JournalModel.findOne({ short_title });
     if (!journal) {
       return res.status(404).json({ error: "Journal not found" });
     }

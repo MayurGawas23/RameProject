@@ -13,7 +13,7 @@ import FileUpload from "@/components/file-upload";
 
 const EditJournal = ({ journal }) => {
   const router = useRouter();
-  const { issn } = router.query;
+  const { short_title } = router.query;
 
   const [formData, setFormData] = useState({
     journalTitle: journal?.journalTitle || "",
@@ -134,7 +134,7 @@ const EditJournal = ({ journal }) => {
       }
 
       await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/journals/${issn}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/journals/${short_title}`,
         formData,
         {
           headers: {
@@ -294,16 +294,16 @@ const EditJournal = ({ journal }) => {
 };
 
 export const getServerSideProps = async (context) => {
-  const { issn } = context.params;
+  const { short_title } = context.params;
 
-  if (!issn) {
+  if (!short_title) {
     return {
       props: { journal: null },
     };
   }
 
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${issn}`);
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${short_title}`);
     return {
       props: {
         journal: response.data,

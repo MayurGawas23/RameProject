@@ -29,21 +29,25 @@ const SubmitPaper = ({ reviewers }) => {
     const [coauthors, setCoauthors] = useState([{ username: "", email: "", affiliation: "" }]);
     const [pages, setPages] = useState("");
     const [type, setType] = useState("")
+     const [jshorttitle, setJshorttitle] = useState("")
 
     const { user } = useAuth()
 
     const router = useRouter();
-    const { issn } = router.query;
+    const { short_title } = router.query;
 
     useEffect(() => {
-        if (issn) {
-            fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${issn}`)
+        if (short_title) {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${short_title}`)
                 .then((res) => res.json())
-                .then((data) => setJournal(data))
+                .then((data) => {
+                    setJournal(data);
+                    setJshorttitle(data.short_title);  // ✅ Set jshorttitle here
+                })
                 .catch((err) => console.error("Error fetching journal:", err));
         }
-    }, [issn]);
-
+    }, [short_title]);
+    
     const handleAddReference = () => setReferences([...references, ""]);
     const handleAddCoauthor = () => setCoauthors([...coauthors, { username: "", email: "", affiliation: "" }]);
     const handleAssign = () => {
@@ -62,7 +66,9 @@ const SubmitPaper = ({ reviewers }) => {
                 setMessage("You must be logged in to submit a paper.");
                 return;
             }
-
+    
+            console.log("Submitting paper with journalId:", jshorttitle); // ✅ Debugging Log
+    
             await axios.post(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/papers/submit`,
                 {
@@ -71,7 +77,7 @@ const SubmitPaper = ({ reviewers }) => {
                     indexTerms,
                     references,
                     pages,
-                    journalId: issn,
+                    journalId: jshorttitle, // ✅ Ensure this is set
                     journalName: journal?.journalTitle || "",
                     pdf: uploadedFileUrl,
                     suggestedreviewers: selectedReviewers,
@@ -84,7 +90,7 @@ const SubmitPaper = ({ reviewers }) => {
                     },
                 }
             );
-
+    
             setMessage("Paper submitted successfully!");
             setPaperTitle("");
             setAbstract("");
@@ -92,13 +98,15 @@ const SubmitPaper = ({ reviewers }) => {
             setReferences([""]);
             setPages("");
             setSelectedReviewers([]);
-            setCoauthors([{ username: "", email: "", affiliation: "" }]); // Reset properly
-            setType("")
+            setCoauthors([{ username: "", email: "", affiliation: "" }]);
+            setType("");
+            setJshorttitle("");
             router.push("/user-papers");
         } catch (err) {
             setMessage(err.response?.data?.error || "An error occurred.");
         }
     };
+    
 
     //     const isValidCoauthors = coauthors.every(coa => coa.email.trim() !== "");
     // if (!isValidCoauthors) {
@@ -116,7 +124,7 @@ const SubmitPaper = ({ reviewers }) => {
                 <div className="bg-blue-400 w-[60%]">
                     <form className="bg-white p-6 shadow-md rounded w-full" onSubmit={handleSubmit}>
                         <label className="block font-bold">Selected Journal:</label>
-                        <h1 className="mb-4 font-bold text-lg">{journal ? ` ${journal.journalTitle} (${journal.issn})` : "Loading..."}</h1>
+                        <h1 className="mb-4 font-bold text-lg">{journal ? ` ${journal.journalTitle} (${journal.short_title})` : "Loading..."}</h1>
                         {message && (
                             <p className={`mb-4 ${message.includes("successfully") ? "text-green-600" : "text-red-600"}`}>{message}</p>
                         )}

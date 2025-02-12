@@ -53,8 +53,8 @@ const volumeSchema = new mongoose.Schema({
 
 // Schema for a journal
 const journalSchema = new mongoose.Schema({
-  journalTitle: String,
-  short_title: String,
+  journalName: String,
+  short_title:{type:String, unique:true},
   issn: String,
   online_issn: String,
   subject: String,

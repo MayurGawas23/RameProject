@@ -4,14 +4,14 @@ import { format } from "date-fns";
 import { ArrowLeft } from "lucide-react";
 
 export const getServerSideProps = async (context) => {
-  const { issn, volumeNumber, issueNumber , paperNumber } = context.params; // Extract the ISSN from the URL
-  console.log("issn", issn)
+  const { short_title, volumeNumber, issueNumber , paperNumber } = context.params; // Extract the ISSN from the URL
+  console.log("issn", short_title)
 
   try {
      // Run both fetch requests concurrently
      const [papersResponse, journalResponse] = await Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${issn}/volumes/${volumeNumber}/issues/${issueNumber}/papers`),
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${issn}`)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${short_title}/volumes/${volumeNumber}/issues/${issueNumber}/papers`),
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${short_title}`)
     ]);
 
     // Parse both responses as JSON
@@ -38,7 +38,7 @@ export const getServerSideProps = async (context) => {
         // journal,
         journal:journalData,
         papers: papersData, // Pass the journal object as a prop
-        issn,
+        short_title,
         volumeNumber,
         issueNumber,
         // journal
@@ -58,19 +58,19 @@ export const getServerSideProps = async (context) => {
   }
 };
 
-const index = ({ papers, issn, volumeNumber, issueNumber, paperNumber , journal }) => {
+const index = ({ papers, short_title, volumeNumber, issueNumber, paperNumber , journal }) => {
   console.log("papers", papers)
   return (
     <div>
       <Header />
       <Link
-            href={`/journals/${issn}/volume`}
+            href={`/journals/${short_title}/volume`}
             className="text-blue-500 hover:underline  mt-4 flex p-2 px-[200px]"
           >
            <ArrowLeft/> Back 
           </Link>
         <div className="w-full h-full mx-auto bg-bleue-50">
-        <div onClick={()=> router.push(`/journals/${issn}`)} className="h-[200px] bg-reed-300 w-full  flex justify-center items-center gap-10 p-4 cursor-pointer ">
+        <div onClick={()=> router.push(`/journals/${short_title}`)} className="h-[200px] bg-reed-300 w-full  flex justify-center items-center gap-10 p-4 cursor-pointer ">
             <div className="h-[170px] w-[120px] p-1 bg-gray-200">
             <img src={journal.coverImg} className="w-full h-full"></img>
             </div>
@@ -88,13 +88,13 @@ const index = ({ papers, issn, volumeNumber, issueNumber, paperNumber , journal 
           </div> */}
       <div className="p-6 w-[80%] mx-auto">
         <h1 className="text-2xl font-bold mb-4">
-          Papers in Volume {volumeNumber}, Issue {issueNumber} (ISSN: {issn})
+          Papers in Volume {volumeNumber}, Issue {issueNumber} (ISSN: {short_title})
         </h1>
         {papers && papers.length > 0 ? (
           <div className="grid grid-cols-1  gap-6">
             {papers.map((paper) => (
               <div key={paper.doi} className="bg-whitee border-b p-4 rounded shadow">
-                <Link href={`/journals/${issn}/volumes/${volumeNumber}/issues/${issueNumber}/papers/${paper.paperNumber}`} className="text-lg font-semibold mb-2 hover:text-[#3a00a7] hover:underline hover:cursor-pointer ">{paper.paperTitle}</Link>
+                <Link href={`/journals/${short_title}/volumes/${volumeNumber}/issues/${issueNumber}/papers/${paper.paperNumber}`} className="text-lg font-semibold mb-2 hover:text-[#3a00a7] hover:underline hover:cursor-pointer ">{paper.paperTitle}</Link>
                 {console.log("Authors array:", paper.authors)}
                 <p className="text-gray-500 mb-2">
                   Authors: {Array.isArray(paper.authors) && paper.authors.length > 0
@@ -130,7 +130,7 @@ const index = ({ papers, issn, volumeNumber, issueNumber, paperNumber , journal 
           <p className="text-gray-500 mt-2">No papers available for this issue.</p>
         )}
         <Link
-          href={`/journals/${issn}/volumes`}
+          href={`/journals/${short_title}/volumes`}
           className="text-blue-500 hover:underline block mt-4"
         >
           Back to Issues

@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useSetState } from "@mantine/hooks";
 
 const PaperSubmit = () => {
   const router = useRouter();
   const { paperId } = router.query; // Get paperId from the URL params
+  console.log(paperId)
 
   const [journals, setJournals] = useState([]);
-  const [selectedISSN, setSelectedISSN] = useState("");
+  // const [selectedISSN, setSelectedISSN] = useState("");
   const [volumes, setVolumes] = useState([]);
   const [selectedVolume, setSelectedVolume] = useState("");
   const [newVolume, setNewVolume] = useState("");
   const [issues, setIssues] = useState([]);
   const [selectedIssue, setSelectedIssue] = useState("");
   const [newIssue, setNewIssue] = useState("");
+  const [selectedShortTitle, setSelectedShortTitle] = useState("");
+  // const [selectedJournalName, setSelectedJournalName] = useState("")
 
   // Paper fields
   const [paperTitle, setPaperTitle] = useState("");
@@ -32,25 +36,53 @@ const PaperSubmit = () => {
       .then(setJournals);
   }, []);
 
+  // console.log(selectedISSN);
+  // console.log(SelectedShort_title);
+  
+  
+
   // Fetch volumes when ISSN is selected
   useEffect(() => {
-    if (selectedISSN) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${selectedISSN}/volumes`)
+    if (selectedShortTitle) {
+      console.log("Fetching volumes for:", selectedShortTitle);
+      
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${selectedShortTitle}`)
         .then((res) => res.json())
-        .then(setVolumes);
+        .then((data) => {
+          console.log("Fetched Journal Data:", data);
+          
+          if (data.volumes) {
+            console.log("Extracted Volumes:", data.volumes);
+            setVolumes(data.volumes); // Extract volumes array
+          } else {
+            console.error("No volumes found in response!");
+            setVolumes([]);
+          }
+        })
+        .catch((error) => console.error("Error fetching volumes:", error));
     }
-  }, [selectedISSN]);
+  }, [selectedShortTitle]);
+  
+  
 
   // Fetch issues when volume is selected (only if it's an existing volume)
   useEffect(() => {
-    if (selectedVolume && selectedVolume !== "new" && selectedISSN) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${selectedISSN}/volumes/${selectedVolume}/issues`)
+    if (selectedVolume && selectedVolume !== "new" && selectedShortTitle) {
+      console.log(`Fetching issues for ${selectedShortTitle}, Volume: ${selectedVolume}`);
+      
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${selectedShortTitle}/volumes/${selectedVolume}/issues`)
         .then((res) => res.json())
-        .then(setIssues);
+        .then((data) => {
+          console.log("Fetched Issues:", data);
+          setIssues(data); // Ensure issues are correctly stored
+        })
+        .catch((error) => console.error("Error fetching issues:", error));
     } else {
       setIssues([]); // Reset issues when creating a new volume
     }
-  }, [selectedVolume, selectedISSN]);
+  }, [selectedVolume, selectedShortTitle]);
+  
+
 
   // Fetch paper data if vId is available
   useEffect(() => {
@@ -58,10 +90,8 @@ const PaperSubmit = () => {
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/papers/${paperId}`)
         .then((res) => res.json())
         .then((data) => {
-          // Check if data is correct
-          console.log('Fetched paper data:', data);
-
-          // Prefill the form with paper data
+          console.log("Fetched paper data:", data);
+  
           setPaperTitle(data.paperTitle || "");
           setAuthors(data.authors || [{ name: "", email: "", affiliation: "" }]);
           setIndexTerms(data.indexTerms || "");
@@ -71,15 +101,25 @@ const PaperSubmit = () => {
           setDoi(data.doi || "");
           setPublicationDate(data.publicationDate || "");
           setPdf(data.pdf || "");
-
-          // Pre-select the journal from the paper data
-          setSelectedISSN(data.journalISSN || "");
-          setSelectedVolume(data.volume || "");
-          setSelectedIssue(data.issue || "");
+  
+          // Ensure journal selection matches short_title
+          if (data.jshorttitle) {
+            setSelectedShortTitle(data.jshorttitle);
+          }
+  
+          // Auto-select volume and issue
+          if (data.volume) {
+            setSelectedVolume(data.volume);
+          }
+          if (data.issue) {
+            setSelectedIssue(data.issue);
+          }
         })
         .catch((error) => console.error("Failed to fetch paper data:", error));
     }
   }, [paperId]);
+  
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -93,7 +133,7 @@ const PaperSubmit = () => {
       // Create new volume if needed
       if (selectedVolume === "new" && newVolume) {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/journals/${selectedISSN}/volumes`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/journals/${selectedShortTitle}/volumes`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -108,7 +148,7 @@ const PaperSubmit = () => {
       // Create new issue if needed
       if (selectedIssue === "new" && newIssue) {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/journals/${selectedISSN}/volumes/${targetVolume}/issues`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/journals/${selectedShortTitle}/volumes/${targetVolume}/issues`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -132,14 +172,15 @@ const PaperSubmit = () => {
       console.log("Submitting paper to volume:", targetVolume, "and issue:", targetIssue);
 
       const paperData = { paperTitle, authors, indexTerms, abstract, references, pages, doi, publicationDate , pdf };
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/journals/${selectedISSN}/volumes/${targetVolume}/issues/${targetIssue}/papers`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(paperData),
-        }
-      );
+     await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL}/api/journals/${selectedShortTitle}/volumes/${targetVolume}/issues/${targetIssue}/papers`,
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(paperData),
+  }
+);
+
 
       alert("Paper submitted successfully!");
     } catch (error) {
@@ -155,17 +196,19 @@ const PaperSubmit = () => {
         {/* Journal Selection (auto-selected from the paper schema) */}
         <label className="block font-medium">Journal (auto-selected from paper schema):</label>
         <select
-          className="w-full border rounded-lg p-2"
-          value={selectedISSN}
-          onChange={(e) => setSelectedISSN(e.target.value)}
-        >
-          <option value="">Select Journal</option>
-          {journals.map((journal) => (
-            <option key={journal.issn} value={journal.issn}>
-              {journal.journalTitle} ({journal.issn})
-            </option>
-          ))}
-        </select>
+  className="w-full border rounded-lg p-2"
+  value={selectedShortTitle}  // Ensure this is controlled by state
+  onChange={(e) => setSelectedShortTitle(e.target.value)}
+>
+  <option value="">Select Journal</option>
+  {journals.map((journal) => (
+    <option key={journal.issn} value={journal.short_title}>
+      {journal.journalTitle} ({journal.short_title})
+    </option>
+  ))}
+</select>
+
+
 
         {/* Volume Selection */}
         <label className="block font-medium">Select Volume:</label>
@@ -173,18 +216,21 @@ const PaperSubmit = () => {
   className="w-full border rounded-lg p-2"
   value={selectedVolume}
   onChange={(e) => setSelectedVolume(e.target.value)}
-  disabled={!selectedISSN}
+  disabled={!selectedShortTitle}
 >
   <option value="">Select Volume</option>
-  {/* Only map if volumes exist */}
-  {volumes?.length > 0 &&
+  {volumes.length > 0 ? (
     volumes.map((volume) => (
       <option key={volume.volumeNumber} value={volume.volumeNumber}>
         Volume {volume.volumeNumber}
       </option>
-    ))}
+    ))
+  ) : (
+    <option disabled>No volumes available</option>
+  )}
   <option value="new">Create New Volume</option>
 </select>
+
 
 
         {selectedVolume === "new" && (
@@ -200,20 +246,25 @@ const PaperSubmit = () => {
 
         {/* Issue Selection */}
         <label className="block font-medium">Select Issue:</label>
-        <select
-          className="w-full border rounded-lg p-2"
-          value={selectedIssue}
-          onChange={(e) => setSelectedIssue(e.target.value)}
-          disabled={!selectedVolume}
-        >
-          <option value="">Select Issue</option>
-          {issues.map((issue) => (
-            <option key={issue.issueNumber} value={issue.issueNumber}>
-              Issue {issue.issueNumber}
-            </option>
-          ))}
-          <option value="new">Create New Issue</option>
-        </select>
+<select
+  className="w-full border rounded-lg p-2"
+  value={selectedIssue}
+  onChange={(e) => setSelectedIssue(e.target.value)}
+  disabled={!selectedVolume}
+>
+  <option value="">Select Issue</option>
+  {issues.length > 0 ? (
+    issues.map((issue) => (
+      <option key={issue.issueNumber} value={issue.issueNumber}>
+        Issue {issue.issueNumber}
+      </option>
+    ))
+  ) : (
+    <option disabled>No issues available</option>
+  )}
+  <option value="new">Create New Issue</option>
+</select>
+
 
         {selectedIssue === "new" && (
           <input

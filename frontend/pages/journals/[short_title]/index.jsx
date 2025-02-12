@@ -9,19 +9,19 @@ import { useRouter } from "next/router";
 // pages/journals/[issn].js
 
 export const getServerSideProps = async (context) => {
-  const { issn } = context.params;  // This should be something like '2583-0961'
+  const { short_title } = context.params;  // This should be something like '2583-0961'
 
   // Check if `issn` is a valid journal, and prevent matching static assets
-  if (!issn || issn.includes('.')) {
-    return {
-      notFound: true, // Don't process requests for static assets (like .png files)
-    };
-  }
+  // if (!issn || issn.includes('.')) {
+  //   return {
+  //     notFound: true, // Don't process requests for static assets (like .png files)
+  //   };
+  // }
 
-  console.log("ISSN:", issn);  // Logs the correct journal ISSN like '2583-0961'
+  // Logs the correct journal ISSN like '2583-0961'
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${issn}`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/journals/${short_title}`);
     const data = await response.json();
     console.log(data)
 
@@ -71,7 +71,7 @@ const JournalDetails = ({ journal, error }) => {
            <ArrowLeft/> Back 
           </Link>
         <div className="w-full h-full mx-auto bg-bleue-50">
-        <div onClick={()=> router.push(`/journals/${journal.issn}`)} className="h-[200px] bg-reed-300 w-full  flex justify-center items-center gap-10 p-4 cursor-pointer ">
+        <div onClick={()=> router.push(`/journals/${journal.short_title}`)} className="h-[200px] bg-reed-300 w-full  flex justify-center items-center gap-10 p-4 cursor-pointer ">
             <div className="h-[170px] w-[120px] p-1 bg-gray-200">
             <img src={journal.coverImg} className="w-full h-full"></img>
             </div>
@@ -81,10 +81,10 @@ const JournalDetails = ({ journal, error }) => {
           </div>
           </div>
           <div className="h-[40px] w-full  flex items-center justify-center mb-4  ">
-            <Link  href={`/journals/${journal.issn}/editorialboard`}    className="flex gap-2  border-black px-10  text-blue-600 hover:underline cursor-pointer h-full items-center "><Users />Editorial Board</Link>
-            <Link href={`/journals/${journal.issn}/aim&scope`} className="flex gap-2  border-black px-10  text-blue-600 hover:underline cursor-pointer  h-full items-center "  ><Telescope />Aim & Scope</Link>
-            <Link href={`/journals/${journal.issn}/submitpaper`} className="flex gap-2  border-black px-10  text-blue-600 hover:underline cursor-pointer h-full items-center "   ><BookText />Submit Manuscript</Link>
-            <Link href={`/journals/${journal.issn}/volumes`} className="flex gap-2  border-black px-10  text-blue-600 hover:underline cursor-pointer h-full items-center "  ><LibraryBig />Archives</Link>
+            <Link  href={`/journals/${journal.short_title}/editorialboard`}    className="flex gap-2  border-black px-10  text-blue-600 hover:underline cursor-pointer h-full items-center "><Users />Editorial Board</Link>
+            <Link href={`/journals/${journal.short_title}/aim&scope`} className="flex gap-2  border-black px-10  text-blue-600 hover:underline cursor-pointer  h-full items-center "  ><Telescope />Aim & Scope</Link>
+            <Link href={`/journals/${journal.short_title}/submitpaper`} className="flex gap-2  border-black px-10  text-blue-600 hover:underline cursor-pointer h-full items-center "   ><BookText />Submit Manuscript</Link>
+            <Link href={`/journals/${journal.short_title}/volumes`} className="flex gap-2  border-black px-10  text-blue-600 hover:underline cursor-pointer h-full items-center "  ><LibraryBig />Archives</Link>
             <Link href={`/contact`} className="flex gap-2 px-10 text-blue-600 hover:underline  cursor-pointer h-full items-center "  ><Mail />Contact us</Link>
           </div>
  

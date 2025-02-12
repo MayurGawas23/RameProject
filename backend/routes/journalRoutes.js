@@ -35,17 +35,17 @@ router.post('/upload-file', upload.single('file'), journalController.handleFileU
 router.post('/fetch-dois', journalController.fetchAndSaveDOIs);
 
 router.get('/journals', journalController.getAllJournals);
-router.get('/journals/:issn', journalController.getJournalByISSN);
-router.get('/journals/:issn/volumes', journalController.getVolumesByISSN);
-router.get('/journals/:issn/volumes/:volumeNumber/issues', journalController.getIssuesByVolume);
-router.get('/journals/:issn/volumes/:volumeNumber/issues/:issueNumber/papers', journalController.getPapersByIssue);
-router.get('/journals/:issn/volumes/:volumeNumber/issues/:issueNumber/papers/:paperNumber', journalController.getPaper)
+router.get('/journals/:short_title', journalController.getJournalByISSN);
+router.get('/journals/:short_title/volumes', journalController.getVolumesByISSN);
+router.get('/journals/:short_title/volumes/:volumeNumber/issues', journalController.getIssuesByVolume);
+router.get('/journals/:short_title/volumes/:volumeNumber/issues/:issueNumber/papers', journalController.getPapersByIssue);
+router.get('/journals/:short_title/volumes/:volumeNumber/issues/:issueNumber/papers/:paperNumber', journalController.getPaper)
 
-router.post('/journals/:issn/volumes/:volumeNumber/issues/:issueNumber/papers', journalController.submitPaper);
-router.post('/journals/:issn/volumes/:volumeNumber/issues', journalController.createIssue);
-router.post('/journals/:issn/volumes', journalController.createVolume);
+router.post('/journals/:short_title/volumes/:volumeNumber/issues/:issueNumber/papers', journalController.submitPaper);
+router.post('/journals/:short_title/volumes/:volumeNumber/issues', journalController.createIssue);
+router.post('/journals/:short_title/volumes', journalController.createVolume);
 
-router.put('/journals/:issn', journalController.updateJournal)
+router.put('/journals/:short_title', journalController.updateJournal)
 
 
 
@@ -54,78 +54,78 @@ router.put('/journals/:issn', journalController.updateJournal)
 // router.get('/journals/:issn/editorialboard', journalController.getEditors)
 
 // Fetch all journals
-router.get('/api/journals', async (req, res) => {
-    const journals = await Journal.find();
-    res.json(journals);
-});
+// router.get('/api/journals', async (req, res) => {
+//     const journals = await Journal.find();
+//     res.json(journals);
+// });
 
-// Fetch volumes for a journal
-router.get('/api/volumes/:journalId', async (req, res) => {
-    const volumes = await Volume.find({ journal: req.params.journalId });
-    res.json(volumes);
-});
+// // Fetch volumes for a journal
+// router.get('/api/volumes/:journalId', async (req, res) => {
+//     const volumes = await Volume.find({ journal: req.params.journalId });
+//     res.json(volumes);
+// });
 
-// Fetch issues for a volume
-router.get('/api/issues/:volumeId', async (req, res) => {
-    const issues = await Issue.find({ volume: req.params.volumeId });
-    res.json(issues);
-});
-
-// Submit a paper
-router.post('/api/papers', async (req, res) => {
-    const { journalId, volumeId, issueId, title, author, file } = req.body;
-    
-    let volume = volumeId;
-    if (!volumeId) {
-        // Create new volume if not selected
-        const newVolume = new Volume({ journal: journalId });
-        await newVolume.save();
-        volume = newVolume._id;
-    }
-
-    let issue = issueId;
-    if (!issueId) {
-        // Create new issue if not selected
-        const newIssue = new Issue({ volume });
-        await newIssue.save();
-        issue = newIssue._id;
-    }
-
-    const newPaper = new Paper({ journal: journalId, volume, issue, title, author, file });
-    await newPaper.save();
-    res.json({ success: true, paper: newPaper });
-});
+// // Fetch issues for a volume
+// router.get('/api/issues/:volumeId', async (req, res) => {
+//     const issues = await Issue.find({ volume: req.params.volumeId });
+//     res.json(issues);
+// });
 
 // Submit a paper
-router.post('/api/papers', async (req, res) => {
-    const { journalId, volumeId, issueId, title, author, file } = req.body;
+// router.post('/api/papers', async (req, res) => {
+//     const { journalId, volumeId, issueId, title, author, file } = req.body;
     
-    let volume = volumeId;
-    if (!volumeId) {
-        // Create new volume if not selected
-        const newVolume = new Volume({ journal: journalId });
-        await newVolume.save();
-        volume = newVolume._id;
-    }
+//     let volume = volumeId;
+//     if (!volumeId) {
+//         // Create new volume if not selected
+//         const newVolume = new Volume({ journal: journalId });
+//         await newVolume.save();
+//         volume = newVolume._id;
+//     }
 
-    let issue = issueId;
-    if (!issueId) {
-        // Create new issue if not selected
-        const newIssue = new Issue({ volume });
-        await newIssue.save();
-        issue = newIssue._id;
-    }
+//     let issue = issueId;
+//     if (!issueId) {
+//         // Create new issue if not selected
+//         const newIssue = new Issue({ volume });
+//         await newIssue.save();
+//         issue = newIssue._id;
+//     }
 
-    const newPaper = new Paper({ journal: journalId, volume, issue, title, author, file });
-    await newPaper.save();
-    res.json({ success: true, paper: newPaper });
-});
+//     const newPaper = new Paper({ journal: journalId, volume, issue, title, author, file });
+//     await newPaper.save();
+//     res.json({ success: true, paper: newPaper });
+// });
 
-router.get('/api/journals/:issn/volumes/:volumeNumber/issues/:issueNumber/papers/:paperNumber', async (req, res) => {
+// Submit a paper
+// router.post('/api/papers', async (req, res) => {
+//     const { journalId, volumeId, issueId, title, author, file } = req.body;
+    
+//     let volume = volumeId;
+//     if (!volumeId) {
+//         // Create new volume if not selected
+//         const newVolume = new Volume({ journal: journalId });
+//         await newVolume.save();
+//         volume = newVolume._id;
+//     }
+
+//     let issue = issueId;
+//     if (!issueId) {
+//         // Create new issue if not selected
+//         const newIssue = new Issue({ volume });
+//         await newIssue.save();
+//         issue = newIssue._id;
+//     }
+
+//     const newPaper = new Paper({ journal: journalId, volume, issue, title, author, file });
+//     await newPaper.save();
+//     res.json({ success: true, paper: newPaper });
+// });
+
+router.get('/api/journals/:short_title/volumes/:volumeNumber/issues/:issueNumber/papers/:paperNumber', async (req, res) => {
     try {
-      const { issn, volumeNumber, issueNumber, paperNumber } = req.params;
+      const { short_title, volumeNumber, issueNumber, paperNumber } = req.params;
   
-      const journal = await Journal.findOne({ issn });
+      const journal = await Journal.findOne({ short_title });
       if (!journal) return res.status(404).json({ error: 'Journal not found' });
   
       const volume = journal.volumes.find(v => v.volumeNumber === parseInt(volumeNumber));

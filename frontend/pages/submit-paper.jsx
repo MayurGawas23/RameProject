@@ -19,7 +19,7 @@ const SubmitPaper = ({reviewers}) => {
     const [selectedReviewers, setSelectedReviewers] = useState([]);
 
   const [journals, setJournals] = useState([]);
-  const [selectedISSN, setSelectedISSN] = useState(""); // Store the ISSN for selected journal
+  // const [selectedISSN, setSelectedISSN] = useState(""); // Store the ISSN for selected journal
   const [message, setMessage] = useState("");
   // Paper fields
   const [paperTitle, setPaperTitle] = useState("");
@@ -35,6 +35,7 @@ const SubmitPaper = ({reviewers}) => {
   const [pdf, setPdf] = useState("")
   const [suggestedreviewers, setSuggestedreviewers] = useState([""]);
  const [type, setType] = useState("")
+ const [jshorttitle, setJshorttitle] = useState("")
   const router = useRouter();
   const {user} = useAuth()
 
@@ -75,7 +76,7 @@ const SubmitPaper = ({reviewers}) => {
           indexTerms,
           references,
           pages,
-          journalId: selectedISSN, // Assuming selectedISSN is the journal ID
+          journalId: jshorttitle, // Assuming selectedISSN is the journal ID
           journalName,
           pdf:uploadedFileUrl ,// Passing the journal name
           suggestedreviewers: selectedReviewers,
@@ -99,9 +100,11 @@ const SubmitPaper = ({reviewers}) => {
       setJournalName(""); // Reset journal name
       setSelectedISSN(""); // Reset selected ISSN
       setPdf("")
+      setJshorttitle("")
       setSuggestedreviewers([""])
       setCoauthors([{ username: "", email: "", affiliation: "" }]); // Reset properly
       setType("")
+      
       router.push("/user-papers");
     } catch (err) {
       setMessage(err.response?.data?.error || "An error occurred.");
@@ -121,19 +124,19 @@ const SubmitPaper = ({reviewers}) => {
           <label className="block font-bold">Select Journal:</label>
           <select
             className="w-full border rounded-lg p-2 mb-4"
-            value={selectedISSN}
+            value={jshorttitle}
             onChange={(e) => {
               const selectedJournal = journals.find(
-                (journal) => journal.issn === e.target.value
+                (journal) => journal.short_title === e.target.value
               );
-              setSelectedISSN(e.target.value);
+              setJshorttitle(e.target.value);
               setJournalName(selectedJournal ? selectedJournal.journalTitle : ""); // Set the journal name
             }}
           >
             <option value="">Select Journal</option>
             {journals.map((journal) => (
-              <option key={journal.issn} value={journal.issn}>
-                {journal.journalTitle} ({journal.issn})
+              <option key={journal.short_title} value={journal.short_title}>
+                {journal.journalTitle} ({journal.short_title})
               </option>
             ))}
           </select>

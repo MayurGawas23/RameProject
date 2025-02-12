@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 
 const paperSchema = new mongoose.Schema({
-  journalISSN: { type: String, ref: 'Journal', required: true },  // Reference to Journal
+  journalISSN: { type: String, ref: 'Journal',  },  // Reference to Journal
 
   // Optionally, you can store the journal name as well if required
   journalName: { type: String, required: true },
+  jshorttitle:{type:String},
   paperTitle: { type: String, required: true },
   
   // Author Information
